@@ -1,4 +1,4 @@
-package com.mobileapp.mobilelaba2.ui.home;
+package com.example.labamobile2.ui.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,12 +8,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.mobileapp.mobilelaba2.R;
-import com.mobileapp.mobilelaba2.databinding.FragmentHomeBinding;
+import com.example.labamobile2.R;
 
 public class HomeFragment extends Fragment {
-
-    private FragmentHomeBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

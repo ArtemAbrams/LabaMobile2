@@ -1,30 +1,27 @@
 package com.example.labamobile2.ui.dashboard.database;
 
-public class StudentCourses {
-    private int id;
-    private String pib;
-    private String name;
-    private String grade1;
-    private String grade2;
-    private String address;
+public class Car {
+    private int id; // Унікальний ідентифікатор
+    private String brand; // Бренд автомобіля
+    private String bodyType; // Тип кузова (седан, універсал тощо)
+    private String color; // Колір
+    private double engineVolume; // Об'єм двигуна
+    private double price; // Ціна
 
-    public String getStudentAVGGrade() {
-        final double grade1 = Double.parseDouble(this.getGrade1());
-        final double grade2 = Double.parseDouble(this.getGrade2());
-        return String.valueOf((grade1 + grade2) / 2);
+    // Конструктор за замовчуванням
+    public Car() {
     }
 
-    public StudentCourses() {
+    // Конструктор з параметрами
+    public Car(String brand, String bodyType, String color, double engineVolume, double price) {
+        this.brand = brand;
+        this.bodyType = bodyType;
+        this.color = color;
+        this.engineVolume = engineVolume;
+        this.price = price;
     }
 
-    public StudentCourses(String pib, String name, String grade1, String grade2, String address) {
-        this.pib = pib;
-        this.name = name;
-        this.grade1 = grade1;
-        this.grade2 = grade2;
-        this.address = address;
-    }
-
+    // Геттери та сеттери для всіх полів
     public int getId() {
         return id;
     }
@@ -33,43 +30,48 @@ public class StudentCourses {
         this.id = id;
     }
 
-    public String getPib() {
-        return pib;
+    public String getBrand() {
+        return brand;
     }
 
-    public void setPib(String pib) {
-        this.pib = pib;
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
-    public String getName() {
-        return name;
+    public String getBodyType() {
+        return bodyType;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setBodyType(String bodyType) {
+        this.bodyType = bodyType;
     }
 
-    public String getGrade1() {
-        return grade1;
+    public String getColor() {
+        return color;
     }
 
-    public void setGrade1(String grade1) {
-        this.grade1 = grade1;
+    public void setColor(String color) {
+        this.color = color;
     }
 
-    public String getGrade2() {
-        return grade2;
+    public double getEngineVolume() {
+        return engineVolume;
     }
 
-    public void setGrade2(String grade2) {
-        this.grade2 = grade2;
+    public void setEngineVolume(double engineVolume) {
+        this.engineVolume = engineVolume;
     }
 
-    public String getAddress() {
-        return address;
+    public double getPrice() {
+        return price;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    // Метод для повернення об'єму двигуна у зручному форматі
+    public String getFormattedEngineVolume() {
+        return String.format("%.1f л", this.engineVolume);
     }
 }

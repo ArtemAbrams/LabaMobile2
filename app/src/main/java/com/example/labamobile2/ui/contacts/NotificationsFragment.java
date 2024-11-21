@@ -1,65 +1,104 @@
-package com.mobileapp.mobilelaba2.ui.contacts;
+package com.example.labamobile2.ui.contacts;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mobileapp.mobilelaba2.R;
+import com.example.labamobile2.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotificationsFragment extends Fragment {
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-    private static final int REQUEST_READ_CONTACTS_PERMISSION = 1;
+public class NotificationsFragment extends Fragment implements OnMapReadyCallback {
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_notifications, container, false);
+    private GoogleMap mMap;
+    private LatLng currentLocation = new LatLng(50.4021, 30.5167); // Поточна локація
+    private EditText addressInput;
+    private ImageButton searchButton;
+    private RecyclerView recyclerView;
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_notifications, container, false);
+
+        // Ініціалізація UI-компонентів
+        addressInput = view.findViewById(R.id.searchField);
+        searchButton = view.findViewById(R.id.searchButton);
+        recyclerView = view.findViewById(R.id.recyclerViewContact);
+
+        // Налаштування RecyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        List<Contact> contacts = getContacts(); // Функція для отримання контактів
+        ContactsAdapter adapter = new ContactsAdapter(requireContext(), contacts);
+        recyclerView.setAdapter(adapter);
+
+        // Ініціалізація карти
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+
+        // Логіка кнопки пошуку
+        searchButton.setOnClickListener(v -> {
+            String address = addressInput.getText().toString().trim();
+            if (!TextUtils.isEmpty(address)) {
+                geocodeAddress(address);
+            } else {
+                addressInput.setError("Введіть адресу");
+            }
+        });
+
+        return view;
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
 
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Якщо дозвіл не наданий, викличе запит на дозвіл
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS_PERMISSION);
-        } else {
-            // Якщо дозвіл вже наданий, відображення контактів
-            List<Contact> ivanContacts = getContactsByName("Ivan");
-
-            RecyclerView recyclerView = view.findViewById(R.id.recyclerViewContact);
-            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-            ContactsAdapter contactsAdapter = new ContactsAdapter(requireContext(), ivanContacts);
-            recyclerView.setAdapter(contactsAdapter);
-        }
+        // Додавання маркера на поточне місце
+        mMap.addMarker(new MarkerOptions().position(currentLocation).title("Поточне місце"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
     }
 
-    public List<Contact> getContactsByName(String nameToSearch) {
+    private List<Contact> getContacts() {
         List<Contact> contacts = new ArrayList<>();
 
         String[] phoneProjection = {
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,  // Додано ID контакту
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.NUMBER
         };
 
-        // Оновлення selection для пошуку контакту з конкретним ім'ям
-        String selection = "UPPER(" + ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + ") LIKE ?";
-        String[] selectionArgs = {nameToSearch.toUpperCase() + "%"};  // Пошук по імені, не враховуючи регістр
+        String selection = ContactsContract.CommonDataKinds.Phone.NUMBER + " LIKE ?"; // Фільтрація номерів
+        String[] selectionArgs = {"%" + 7}; // Номер закінчується на `7`
 
         Cursor cursor = requireContext().getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -71,20 +110,14 @@ public class NotificationsFragment extends Fragment {
 
         if (cursor != null) {
             try {
-                int contactIdIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
                 int displayNameIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
                 int phoneNumberIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER);
 
                 while (cursor.moveToNext()) {
-                    String contactId = cursor.getString(contactIdIndex);  // Отримання ID контакту
                     String contactName = cursor.getString(displayNameIndex);
                     String contactNumber = cursor.getString(phoneNumberIndex);
 
-                    // Отримуємо адресу контакту
-                    String contactAddress = getContactAddress(contactId);
-
-                    // Додаємо контакт з адресою
-                    contacts.add(new Contact(contactName, " ", contactNumber, contactAddress));
+                    contacts.add(new Contact(contactName, "", contactNumber));
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
@@ -96,37 +129,62 @@ public class NotificationsFragment extends Fragment {
         return contacts;
     }
 
-    // Метод для отримання адреси контакту за його ID
-    private String getContactAddress(String contactId) {
-        String address = null;
-        String[] addressProjection = {
-                ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS
-        };
+    private void geocodeAddress(String address) {
+        // URL для Google Geocoding API
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=AIzaSyDZG1vyyuvtlZt9GThK6fypPxuUQ-qREpE";
 
-        String addressSelection = ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + " = ?";
-        String[] addressSelectionArgs = {contactId};
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).build();
 
-        Cursor addressCursor = requireContext().getContentResolver().query(
-                ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI,
-                addressProjection,
-                addressSelection,
-                addressSelectionArgs,
-                null
-        );
-
-        if (addressCursor != null) {
-            try {
-                if (addressCursor.moveToFirst()) {  // Перевіряємо, чи є адреса у контакту
-                    int addressIndex = addressCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS);
-                    address = addressCursor.getString(addressIndex);
-                }
-            } catch (IllegalArgumentException e) {
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 e.printStackTrace();
-            } finally {
-                addressCursor.close();
             }
-        }
 
-        return address;
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    try {
+                        assert response.body() != null;
+                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        JSONArray results = jsonResponse.getJSONArray("results");
+
+                        if (results.length() > 0) {
+                            JSONObject location = results.getJSONObject(0)
+                                    .getJSONObject("geometry")
+                                    .getJSONObject("location");
+
+                            double lat = location.getDouble("lat");
+                            double lng = location.getDouble("lng");
+                            LatLng destination = new LatLng(lat, lng);
+
+                            requireActivity().runOnUiThread(() -> drawRoute(destination));
+                        } else {
+                            requireActivity().runOnUiThread(() -> addressInput.setError("Адреса не знайдена"));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+    private void drawRoute(LatLng destination) {
+        mMap.clear();
+
+        // Додавання маркера для пункту призначення
+        mMap.addMarker(new MarkerOptions().position(destination).title("Місце призначення"));
+
+        // Побудова маршруту
+        PolylineOptions options = new PolylineOptions()
+                .add(currentLocation)
+                .add(destination)
+                .width(10)
+                .color(getResources().getColor(R.color.teal_200));
+
+        mMap.addPolyline(options);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destination, 15));
     }
 }

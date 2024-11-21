@@ -6,22 +6,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mobileapp.mobilelaba2.R;
+import com.example.labamobile2.R;
 
-public class StudentCoursesHolder extends RecyclerView.ViewHolder {
-    TextView pibView;
-    TextView gradesView;
-    TextView addressView;
+public class CarHolder extends RecyclerView.ViewHolder {
+    TextView brandView;
+    TextView bodyTypeView;
+    TextView colorView;
+    TextView engineVolumeView;
+    TextView priceView;
     TextView idView;
-    TextView nameView;
 
-
-    public StudentCoursesHolder(@NonNull View itemView) {
+    public CarHolder(@NonNull View itemView) {
         super(itemView);
-        pibView = itemView.findViewById(R.id.PIB);
-        nameView = itemView.findViewById(R.id.name);
-        gradesView = itemView.findViewById(R.id.grade);
-        addressView = itemView.findViewById(R.id.address);
-        idView = itemView.findViewById(R.id.StudentId);
+        brandView = itemView.findViewById(R.id.brand); // Бренд автомобіля
+        bodyTypeView = itemView.findViewById(R.id.bodyType); // Тип кузова
+        colorView = itemView.findViewById(R.id.color); // Колір
+        engineVolumeView = itemView.findViewById(R.id.engineVolume); // Об'єм двигуна
+        priceView = itemView.findViewById(R.id.price); // Ціна
+        idView = itemView.findViewById(R.id.carId); // ID автомобіля
     }
 }

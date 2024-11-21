@@ -1,5 +1,6 @@
 package com.example.labamobile2.ui.dashboard.database;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -7,38 +8,42 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mobileapp.mobilelaba2.R;
+import com.example.labamobile2.R;
 
 import java.util.List;
 
-public class StudentsCoursesAdapter extends RecyclerView.Adapter<StudentCoursesHolder> {
+public class CarsAdapter extends RecyclerView.Adapter<CarHolder> {
 
     Context context;
-    List<StudentCourses> studentCourses;
+    List<Car> cars;
 
-    public StudentsCoursesAdapter(Context context, List<StudentCourses> studentCourses) {
+    public CarsAdapter(Context context, List<Car> cars) {
         this.context = context;
-        this.studentCourses = studentCourses;
+        this.cars = cars;
     }
 
     @NonNull
     @Override
-    public StudentCoursesHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new StudentCoursesHolder(LayoutInflater.from(context).inflate(R.layout.student_view, parent, false));
+    public CarHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new CarHolder(LayoutInflater.from(context).inflate(R.layout.car_view, parent, false));
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
-    public void onBindViewHolder(@NonNull StudentCoursesHolder holder, int position) {
-        holder.pibView.setText(studentCourses.get(position).getPib());
-        holder.nameView.setText(studentCourses.get(position).getName());
-        holder.gradesView.setText((studentCourses.get(position).getStudentAVGGrade()));
-        holder.addressView.setText(studentCourses.get(position).getAddress());
-        String id = "    " + studentCourses.get(position).getId();
+    public void onBindViewHolder(@NonNull CarHolder holder, int position) {
+        Car car = cars.get(position);
+
+        holder.brandView.setText(car.getBrand());
+        holder.bodyTypeView.setText(car.getBodyType());
+        holder.colorView.setText(car.getColor());
+        holder.engineVolumeView.setText(String.format("%.1f л", car.getEngineVolume()));
+        holder.priceView.setText(String.format("$%.2f", car.getPrice()));
+        String id = "ID: " + car.getId();
         holder.idView.setText(id);
     }
 
     @Override
     public int getItemCount() {
-        return studentCourses.size();
+        return cars.size();
     }
 }

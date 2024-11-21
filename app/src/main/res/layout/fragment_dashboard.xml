@@ -1,6 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.dashboard.DashboardFragment">
+
+    <!-- Заголовок -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Список автомобілів"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Кнопка: Відображення червоних універсалів -->
+    <Button
+        android:id="@+id/buttonRedWagons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Червоні універсали"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonAverageVolume" />
+
+    <!-- Кнопка: Показати середній об'єм двигуна -->
+    <Button
+        android:id="@+id/buttonAverageVolume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Середній об'єм"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintStart_toEndOf="@id/buttonRedWagons"
+        app:layout_constraintEnd_toStartOf="@id/buttonShowAll" />
+
+    <!-- Кнопка: Відображення всіх автомобілів -->
+    <Button
+        android:id="@+id/buttonShowAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Всі автомобілі"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintStart_toEndOf="@id/buttonAverageVolume"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Текст для відображення середнього об'єму двигуна -->
+    <TextView
+        android:id="@+id/averageEngineVolume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Середній об'єм: 0.0 л"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/buttonAverageVolume"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- RecyclerView для списку автомобілів -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCars"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/averageEngineVolume"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

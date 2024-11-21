@@ -1,4 +1,4 @@
-package com.mobileapp.mobilelaba2.ui.dashboard.database;
+package com.example.labamobile2.ui.dashboard.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,9 +10,9 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DBManager extends SQLiteOpenHelper {
+
     public DBManager(@Nullable Context context) {
         super(context, Constants.DB_NAME, null, Constants.DB_VERSION);
     }
@@ -28,77 +28,97 @@ public class DBManager extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addStudent(StudentCourses studentCourses){
+    // Метод для додавання автомобіля
+    public void addCar(Car car) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(Constants.COLUMN_NAME_PIB, studentCourses.getPib());
-        cv.put(Constants.COLUMN_NAME_NAME, studentCourses.getName());
-        cv.put(Constants.COLUMN_NAME_GRADE_1, studentCourses.getGrade1());
-        cv.put(Constants.COLUMN_NAME_GRADE_2, studentCourses.getGrade2());
-        cv.put(Constants.COLUMN_NAME_ADDRESS, studentCourses.getAddress());
+        cv.put(Constants.COLUMN_NAME_BRAND, car.getBrand());
+        cv.put(Constants.COLUMN_NAME_BODY_TYPE, car.getBodyType());
+        cv.put(Constants.COLUMN_NAME_COLOR, car.getColor());
+        cv.put(Constants.COLUMN_NAME_ENGINE_VOLUME, car.getEngineVolume());
+        cv.put(Constants.COLUMN_NAME_PRICE, car.getPrice());
 
         db.insert(Constants.TABLE_NAME, null, cv);
         db.close();
     }
 
-    public void deleteAllStudents() {
-        final List<Integer> ids = getAllStudents().stream().map(StudentCourses::getId).collect(Collectors.toList());
+    // Метод для видалення всіх автомобілів
+    public void deleteAllCars() {
         SQLiteDatabase db = this.getWritableDatabase();
-        ids.forEach(id -> db.delete(Constants.TABLE_NAME, Constants.COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}));
+        db.delete(Constants.TABLE_NAME, null, null);
         db.close();
     }
 
-    public List<StudentCourses> getAllStudents() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        List<StudentCourses> studentCoursesList = new ArrayList<>();
+    // Метод для отримання списку всіх автомобілів
+    public List<Car> getAllCars() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Car> carList = new ArrayList<>();
 
-        String selectAllStudents = "SELECT * FROM " + Constants.TABLE_NAME;
-        Cursor cursor = db.rawQuery(selectAllStudents, null);
+        String selectAllCars = "SELECT * FROM " + Constants.TABLE_NAME;
+        Cursor cursor = db.rawQuery(selectAllCars, null);
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             do {
-                StudentCourses studentCourses = new StudentCourses();
-                studentCourses.setId(Integer.parseInt(cursor.getString(0)));
-                studentCourses.setPib(cursor.getString(1));
-                studentCourses.setName(cursor.getString(2));
-                studentCourses.setGrade1(cursor.getString(3));
-                studentCourses.setGrade2(cursor.getString(4));
-                studentCourses.setAddress(cursor.getString(5));
-                studentCoursesList.add(studentCourses);
-            } while(cursor.moveToNext());
+                Car car = new Car();
+                car.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_ID)));
+                car.setBrand(cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_BRAND)));
+                car.setBodyType(cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_BODY_TYPE)));
+                car.setColor(cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_COLOR)));
+                car.setEngineVolume(cursor.getDouble(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_ENGINE_VOLUME)));
+                car.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_PRICE)));
+                carList.add(car);
+            } while (cursor.moveToNext());
         }
-        return studentCoursesList;
+
+        cursor.close();
+        return carList;
     }
 
-    public List<StudentCourses> getStudentsWithAverageAbove60() {
-        List<StudentCourses> studentsAbove60 = new ArrayList<>();
+    // Метод для отримання червоних автомобілів з типом кузова "універсал"
+    public List<Car> getRedStationWagons() {
         SQLiteDatabase db = this.getReadableDatabase();
+        List<Car> redStationWagons = new ArrayList<>();
 
         String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME +
-                " WHERE (" + Constants.COLUMN_NAME_GRADE_1 + " + " + Constants.COLUMN_NAME_GRADE_2 + ") / 2 > 60";
+                " WHERE " + Constants.COLUMN_NAME_COLOR + " = 'червоний'" +
+                " AND " + Constants.COLUMN_NAME_BODY_TYPE + " = 'універсал'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         if (cursor.moveToFirst()) {
             do {
-                StudentCourses studentCourses = new StudentCourses();
-                studentCourses.setId(Integer.parseInt(cursor.getString(0)));
-                studentCourses.setPib(cursor.getString(1));
-                studentCourses.setName(cursor.getString(2));
-                studentCourses.setGrade1(cursor.getString(3));
-                studentCourses.setGrade2(cursor.getString(4));
-                studentCourses.setAddress(cursor.getString(5));
-                studentsAbove60.add(studentCourses);
+                Car car = new Car();
+                car.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_ID)));
+                car.setBrand(cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_BRAND)));
+                car.setBodyType(cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_BODY_TYPE)));
+                car.setColor(cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_COLOR)));
+                car.setEngineVolume(cursor.getDouble(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_ENGINE_VOLUME)));
+                car.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_PRICE)));
+                redStationWagons.add(car);
             } while (cursor.moveToNext());
         }
 
         cursor.close();
-        return studentsAbove60;
+        return redStationWagons;
     }
 
-    public double getAverageSelectedPercentage() {
-        final double allSize = getAllStudents().size();
-        final double above60Avg = getStudentsWithAverageAbove60().size();
-        return above60Avg / allSize * 100;
+    // Метод для обчислення середнього об'єму двигуна
+    public double getAverageEngineVolume() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double totalVolume = 0;
+        int count = 0;
+
+        String selectQuery = "SELECT " + Constants.COLUMN_NAME_ENGINE_VOLUME + " FROM " + Constants.TABLE_NAME;
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                totalVolume += cursor.getDouble(cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_ENGINE_VOLUME));
+                count++;
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return count > 0 ? totalVolume / count : 0;
     }
 }

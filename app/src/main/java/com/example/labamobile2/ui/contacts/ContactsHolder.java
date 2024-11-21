@@ -1,4 +1,4 @@
-package com.mobileapp.mobilelaba2.ui.contacts;
+package com.example.labamobile2.ui.contacts;
 
 import android.view.View;
 import android.widget.TextView;
@@ -6,7 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mobileapp.mobilelaba2.R;
+import com.example.labamobile2.R;
 
 public class ContactsHolder extends RecyclerView.ViewHolder {
     TextView contactNameSurnameView;
