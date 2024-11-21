@@ -131,7 +131,7 @@ public class NotificationsFragment extends Fragment implements OnMapReadyCallbac
 
     private void geocodeAddress(String address) {
         // URL для Google Geocoding API
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=AIzaSyDZG1vyyuvtlZt9GThK6fypPxuUQ-qREpE";
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=";
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
