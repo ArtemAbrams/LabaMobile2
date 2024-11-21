@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // URL для геокодування назви місця
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + locationName + "&key=AIzaSyBMBZLOkeFApS4NDdCOZwGkajhlf3IEnUA";
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + locationName + "&key=";
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
